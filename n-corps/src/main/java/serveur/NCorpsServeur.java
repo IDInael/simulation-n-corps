@@ -101,6 +101,12 @@ public class NCorpsServeur
                 {
                     public void run()
                     {
+                        try
+                        {
+                            Thread.currentThread().sleep(5000);
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(NCorpsServeur.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                         while(true)
                         {
                             System.out.println(s.toString());
