@@ -101,12 +101,6 @@ public class NCorpsServeur
                 {
                     public void run()
                     {
-                        try
-                        {
-                            Thread.currentThread().sleep(5000);
-                        } catch (InterruptedException ex) {
-                            Logger.getLogger(NCorpsServeur.class.getName()).log(Level.SEVERE, null, ex);
-                        }
                         while(true)
                         {
                             System.out.println(s.toString());
@@ -128,7 +122,7 @@ public class NCorpsServeur
                 case 1:
                     System.out.println("Execution du programme en local avec des corps aleatoires");
                     
-                    randomFilling(50,s);
+                   // randomFilling(50,s);
                     
                     Thread t1=new Thread(new Runnable()
                     {
