@@ -10,6 +10,7 @@ import java.awt.Graphics;
 import java.awt.Toolkit;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.WindowConstants;
 import serveur.NCorps;
@@ -44,17 +45,21 @@ public class Fenetre extends JFrame
         int l=(int)size.getWidth();
         int h=(int)size.getHeight()-100;
         repere.setBackground(Color.black);
-        //repere.setPreferredSize(new Dimension(l,h));
-        repere.setMaximumSize(new Dimension(900,900));
+      //  repere.setPreferredSize(new Dimension(l,h));
+        repere.setMaximumSize(new Dimension(l,800));
         
         this.setPreferredSize(size);
         this.getContentPane().add(this.repere,java.awt.BorderLayout.CENTER);
         this.setBackground(Color.BLACK);
         
+        JScrollPane pan= new JScrollPane(affichage);
+        
         affichage.enable(false);
         affichage.setBackground(Color.black);
+        affichage.setPreferredSize(new Dimension(l,200));
         
-        this.getContentPane().add(this.affichage,java.awt.BorderLayout.SOUTH);
+        //this.getContentPane().add(this.affichage,java.awt.BorderLayout.SOUTH);
+        this.getContentPane().add(pan,java.awt.BorderLayout.SOUTH);  
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
     
@@ -62,7 +67,7 @@ public class Fenetre extends JFrame
     public void paint(Graphics g)
     {
         super.paint(g);
-        String info="IP serveur : "+this.ip+"\n"+this.nc;
+        String info="\nIP serveur : "+this.ip+"\n"+this.nc;
         this.affichage.setText(info);
         this.repere.paint(g);
     }

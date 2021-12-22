@@ -22,9 +22,12 @@ public class NCorps extends UnicastRemoteObject implements NCorpsInterface
     private final int ot;//overtime :  temps de fin des calculs
     private int ci; //current index to compute
     private ArrayList<Corps> systeme; //liste de corps formant un systeme
-    private String name;
+    private final String name; /*nom du systeme*/
     private int nbWorker; //nombre de noeud connecté
     
+    private long start;//temps du debut d'execution du programme
+    private long chrono; //pour mesurer la performance du code
+            
     public NCorps(String name) throws RemoteException
     {
         this.name=name;
@@ -33,9 +36,15 @@ public class NCorps extends UnicastRemoteObject implements NCorpsInterface
         this.ci=0;
         this.systeme=new ArrayList();
         this.t=0;
+        this.chrono=0;
+        this.start=System.nanoTime();
         this.nbWorker=0;
     }
     
+    /**
+     * compte le nombre de worker qui sont connecté pour effectué les taches
+     * @throws RemoteException 
+     */
     @Override
     public void connect() throws RemoteException
     {
@@ -56,6 +65,12 @@ public class NCorps extends UnicastRemoteObject implements NCorpsInterface
         return this.systeme;
     }
     
+    
+    /**
+     * calcul l'acceleration d'un corps i a l'instant t=t+dt avec la formule a=f1+f2+....+fn
+     * @param i
+     * @throws RemoteException 
+     */
     private void calculeNextAcc(int i) throws RemoteException
     {
         double G=6.6742E-11;
@@ -78,7 +93,11 @@ public class NCorps extends UnicastRemoteObject implements NCorpsInterface
     }
     
     
-
+/**
+ * calcule la position d'un corps i en fonction des forces qu'il subit de la part de tous les autres corps
+ * @param i
+ * @throws RemoteException 
+ */
     @Override
     public void compute(int i) throws RemoteException 
     {
@@ -99,6 +118,12 @@ public class NCorps extends UnicastRemoteObject implements NCorpsInterface
         this.calculNextV(ci, t, ax, ay);
     }
 
+    /**
+     * fonction qui return la position du prochain corps à calculer
+     * return -1 sinon
+     * @return
+     * @throws RemoteException 
+     */
     @Override
     public synchronized int hasNext() throws RemoteException 
     {
@@ -114,6 +139,8 @@ public class NCorps extends UnicastRemoteObject implements NCorpsInterface
             // on passe au temps t=t+dt
             if(ci==this.systeme.size())
             {
+                //mesure de performance;
+                chrono=(System.nanoTime()-this.start);
                 ci=0;
                 t+=dt;
                 
@@ -123,6 +150,9 @@ public class NCorps extends UnicastRemoteObject implements NCorpsInterface
                 } catch (InterruptedException ex) {
                     Logger.getLogger(NCorps.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                
+                //on relance le chrono
+                this.start=System.nanoTime();
             }
             
             return res;
@@ -132,7 +162,7 @@ public class NCorps extends UnicastRemoteObject implements NCorpsInterface
     @Override
     public String toString()
     {
-        String res=this.name+" à l'instant  t : " +this.t+" worker : "+this.nbWorker+"\n" ;
+        String res=this.name+" à l'instant  t : " +this.t+"   worker : "+this.nbWorker+"  temps d'execution : "+this.chrono+" nanosec\n" ;
         int i=1;
         
         for(Corps c:this.systeme)

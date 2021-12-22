@@ -13,6 +13,8 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.Random;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,7 +27,7 @@ public class NCorpsServeur
     public static void main(String args[])
     {
         try
-        {
+        {            
             /**
              * initialisation de la classe NCorps avec les données du système solaire
              */
@@ -41,6 +43,7 @@ public class NCorpsServeur
 
             s.add(new Corps(1.989*Math.pow(10,30), 0, 0, 0,    0, new Color(246, 244, 129),1000, "Soleil"));
             
+            
             /**
              * enregistrement dans l'annuaire
              */
@@ -54,40 +57,87 @@ public class NCorpsServeur
             Naming.rebind("rmi://"+ip.getHostAddress()+":1099/ncorps", s);
             System.out.println("Serveur "+ip.getHostAddress()+" en attente de calcul...");
             
-            Fenetre f=new Fenetre(s,ip.getHostAddress());
-            f.pack();
-            f.setVisible(true);
             
-            Thread t1=new Thread(new Runnable()
+            Scanner sc= new Scanner(System.in);
+            
+            System.out.println("Choisissez le mode de lancement : ");
+            System.out.println("1. execution local");
+            System.out.println("2. execution en systeme distribue avec java RMI");
+            System.out.println("votre choix : ");
+            int n=sc.nextInt();
+            
+            System.out.println("Voulez vous afficher la simulation avec une interfaca graphique ? (y/n) : ");
+            String c=sc.next();
+            
+             /*gestion affichage graphique*/
+            if(c.equalsIgnoreCase("y") ||c.equalsIgnoreCase("yes"))
             {
-                public void run()
+                Fenetre f=new Fenetre(s,ip.getHostAddress());
+                f.pack();
+                f.setVisible(true);
+                
+                Thread th=new Thread(new Runnable()
                 {
-                    s.runSimulation();
-                }
-            });
-           // t1.start();
-            /**
-             * gestion affichage
-             */
-            Thread th=new Thread(new Runnable()
-            {
-                public void run()
-                {
-                    while(true)
+                    public void run()
                     {
-                        f.repaint();
-                        try
+                        while(true)
                         {
-                            Thread.currentThread().sleep(100);
-                        } catch (InterruptedException ex) {
-                            Logger.getLogger(NCorpsServeur.class.getName()).log(Level.SEVERE, null, ex);
+                            f.repaint();
+                            try
+                            {
+                                Thread.currentThread().sleep(100);
+                            } catch (InterruptedException ex) {
+                                Logger.getLogger(NCorpsServeur.class.getName()).log(Level.SEVERE, null, ex);
+                            }
                         }
+
                     }
-                    
-                }
-            });
-            th.start();
+                });
+                th.start();
+            }
+            else
+            {
+                Thread th=new Thread(new Runnable()
+                {
+                    public void run()
+                    {
+                        while(true)
+                        {
+                            System.out.println(s.toString());
+                            try
+                            {
+                                Thread.currentThread().sleep(100);
+                            } catch (InterruptedException ex) {
+                                Logger.getLogger(NCorpsServeur.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+
+                    }
+                });
+                th.start();
+            }
             
+             switch(n)
+            {
+                case 1:
+                    System.out.println("Execution du programme en local avec des corps aleatoires");
+                    
+                    randomFilling(50,s);
+                    
+                    Thread t1=new Thread(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            s.runSimulation();
+                        }
+                    });
+                    t1.start();
+                    break;
+                case 2:
+                    System.out.println("En attente des workers pour effectuer les taches");
+                    System.out.println("IP server : "+ip.getHostAddress());
+            }
             
         } catch (RemoteException ex) {
             ex.printStackTrace();
@@ -96,5 +146,29 @@ public class NCorpsServeur
         } catch (UnknownHostException ex) {
             Logger.getLogger(NCorpsServeur.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public static void randomFilling(int n,NCorps s) throws RemoteException
+    {        
+        double m,x0,y0,vx0,vy0;
+        int r=50;
+        
+        s.getSysteme().clear();
+        Random ra= new Random();
+        int red,g,b;
+        for(int i=0;i<n;i++)
+        {
+            m=(Math.random()*(1.0e27-1.0e26))+1.0e26; //random entre [10^26,10^27]
+            x0=(Math.random()*(10e11+10e10))-10e10;//x0 € [-10^5,10^5]
+            y0=(Math.random()*(10e11+10e10))-10e10;//y0 € [-10^5,10^5]
+            vx0=(Math.random()*(10*10e3))-5*10e3;//vx0 € [-5*10^3,5*10^3]
+            vy0=(Math.random()*(10*10e3))-5*10e3;//vy0 € [-5*10^3,5*10^3]
+            red=ra.nextInt(255);
+            g=ra.nextInt(255);
+            b=ra.nextInt(255);
+            
+            s.add(new Corps(m,x0,y0,vx0,vy0,new Color(red,g,b),r,"corps "+i));
+        }
+        
     }
 }
