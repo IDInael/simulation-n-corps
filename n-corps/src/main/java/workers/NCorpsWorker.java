@@ -27,7 +27,6 @@ public class NCorpsWorker
                     Scanner sc= new Scanner(System.in);
                     System.out.println("IP server : ");
                     String ip = sc.nextLine();
-                    
                     s=(NCorpsInterface)Naming.lookup("rmi://"+ip+":1099/ncorps");
                 }
                 catch(Exception e)

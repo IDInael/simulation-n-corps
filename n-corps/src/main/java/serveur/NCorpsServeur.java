@@ -32,6 +32,11 @@ public class NCorpsServeur
              * initialisation de la classe NCorps avec les données du système solaire
              */
             NCorps s= new NCorps("Systeme solaire");
+          
+            /*randomFilling(10000,s);
+           int n=1;
+            String c="y";*/
+          
             s.add(new Corps(3.3E23, 0, 4.7E10, 5.9E4, 0, new Color(241, 203, 131),40, "Mercure"));
             s.add(new Corps(4.9E24, 0, 1.1E11, 3.5E4, 0, new Color(243, 223, 107),55, "Venus"));
             s.add(new Corps(6.0E24, 0, 1.5E11, 3.0E4, 0, new Color(173, 231, 247),100, "Terre"));
@@ -68,6 +73,7 @@ public class NCorpsServeur
             
             System.out.println("Voulez vous afficher la simulation avec une interfaca graphique ? (y/n) : ");
             String c=sc.next();
+            
             
              /*gestion affichage graphique*/
             if(c.equalsIgnoreCase("y") ||c.equalsIgnoreCase("yes"))
@@ -122,7 +128,7 @@ public class NCorpsServeur
                 case 1:
                     System.out.println("Execution du programme en local avec des corps aleatoires");
                     
-                   // randomFilling(50,s);
+                    //randomFilling(500,s);
                     
                     Thread t1=new Thread(new Runnable()
                     {

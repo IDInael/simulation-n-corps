@@ -140,7 +140,7 @@ public class NCorps extends UnicastRemoteObject implements NCorpsInterface
             if(ci==this.systeme.size())
             {
                 //mesure de performance;
-                chrono=(System.nanoTime()-this.start);
+                chrono=(System.nanoTime()-this.start)/1000000;
                 ci=0;
                 t+=dt;
                 
@@ -162,7 +162,7 @@ public class NCorps extends UnicastRemoteObject implements NCorpsInterface
     @Override
     public String toString()
     {
-        String res=this.name+" à l'instant  t : " +this.t+"   worker : "+this.nbWorker+"  temps d'execution : "+this.chrono+" nanosec\n" ;
+        String res=this.name+" à l'instant  t : " +this.t+"   worker : "+this.nbWorker+"  temps d'execution : "+this.chrono+" ms\n" ;
         int i=1;
         
         for(Corps c:this.systeme)
